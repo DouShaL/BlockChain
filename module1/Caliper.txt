@@ -1,0 +1,14 @@
+npx caliper benchmark run --caliper-workspace caliper-benchmarks --caliper-benchconfig benchmarks/samples/fisco-bcos/helloworld/config.yaml  --caliper-networkconfig networks/fisco-bcos/4nodes1group/fisco-bcos.json
+
+npx caliper benchmark run --caliper-workspace caliper-benchmarks --caliper-benchconfig benchmarks/samples/fisco-bcos/transfer/solidity/config.yaml  --caliper-networkconfig networks/fisco-bcos/4nodes1group/fisco-bcos.json
+
+
+firefox caliper-benchmarks/report.html
+\\修改name&description&label偷鸡
+
+
+node -v
+16.0.0
+
+https://blog.csdn.net/m0_72435337/article/details/131877366
+https://blog.csdn.net/m0_72435337/article/details/131880476?spm=1001.2014.3001.5501

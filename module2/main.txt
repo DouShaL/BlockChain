@@ -1,0 +1,40 @@
+cp nodes/192.168.88.129/sdk/* webase-front/conf
+cd webase-front
+bash start.sh
+local host:5002/WeBASE-Front
+
+
+
+0xed3dace91dd4ecc19e1dd8d94cc0cde2c79efbe5	distributor
+0xd7722a78e2945d6ef321826f88a082ce7efd3249	profucer
+0xd82fd9e1cfa65be68ca828dabb9a418720d149a5	retailer
+
+0xbe3bf45421ea9f10adf6e378255396fbef1307ad	contractAddress
+
+newFood
+{
+apple
+1
+producer
+1
+}
+
+addTraceByDistributor
+{
+1
+distributor
+4
+}
+
+addTraceInfoByRetailer
+{
+1
+retailer
+2
+}
+
+getFood
+{
+1
+}
+

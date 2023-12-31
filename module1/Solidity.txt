@@ -1,0 +1,43 @@
+solidity在线IDE:
+https://remix.ethereum.org/
+
+
+// SPDX-License-Identifier: MIT	//版权说明
+pragma solidity ^0.4.25;	//版本声明
+import "./Roles.sol";		//导包
+
+
+contract		//合约
+
+modifier		//函数修饰器
+
+constructor	//构造函数
+
+function		//函数
+
+
+event 事件(值属性)	//定义事件
+emit 事件(传入值)	//触发事件
+
+immutable	//不可变量的使用
+constant		//常量的使用
+
+
+unicode		//字面常量
+
+require(表达式,"信息")	//表达式必须为真,否则返回信息,结束调用
+
+/// @    /**  */ 	//natspec注释:块注释双星号
+/// @title  	一个简单的数据存储演示
+/// @author 	DouSha
+/// @notice 	智能合约将用于最基本的演示
+/// @dev    	提供了存储/获取方法
+/// @custom:x   	自定义描述
+/// @param       	参数说明
+/// @return	返回说明
+
+msg.sender	//调用者地址
+
+
+
+

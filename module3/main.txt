@@ -1,0 +1,71 @@
+npm run serve
+localhost:8082/indexhome	//起后端再访问
+
+导出txt格式
+address
+privateKey
+
+/produce:
+POSTMAN:
+POST:	127.0.0.1:8080/produce	//Body/raw:JSON
+{
+"name":"apple1",
+"traceNumber":1,
+"traceName":"producer",
+"quality":4
+}
+ 
+浏览器:
+F12
+控制台:
+var data = {"name":"apple2","traceNumber":2,"traceName":"producer","quality":4};
+fetch(new Request('http://127.0.0.1:8080/producer',{"method":'POST',"headers":{'content-type':'application/json;charset=UTF-8'},"body":JSON.stringify(data)})).then((resp)=>{console.log(resp)})
+网络/响应
+
+/food:
+POSTMAN:
+GET:	127.0.0.1:8080/food?traceNumber=1	//Params
+{
+traceNumber:1
+}
+
+浏览器:
+fetch(new Request('127.0.0.1:8080/food?traceNumber=1',{"method":'GET'})).then((resp)=>{console.log(resp)})
+
+/adddistribution:
+POSTMAN:
+POST:	127.0.0.1:8080/adddistribution		//Body/raw:JSON
+{
+"traceNumber":1,
+"traceName":"distributor",
+"quality":3
+} 
+
+浏览器:
+var data = {"traceNumber":2,"traceName":"distributor","quality":3};
+fetch(new Request('http://127.0.0.1:8080/adddistribution',{"method":'POST',"headers":{'content-type':'application/json;charset=UTF-8'},"body":JSON.stringify(data)})).then((resp)=>{console.log(resp)})
+
+/addretail:
+POSTMAN:
+POST:	127.0.0.1:8080/addretail		//Body/raw:JSON
+{
+"traceNumber":1,
+"traceName":"distributor",
+"quality":2
+} 
+
+浏览器:
+var data = {"traceNumber":2,"traceName":"distributor","quality":2};
+fetch(new Request('http://127.0.0.1:8080/addretail',{"method":'POST',"headers":{'content-type':'application/json;charset=UTF-8'},"body":JSON.stringify(data)})).then((resp)=>{console.log(resp)})
+
+/trace:
+POSTMAN:
+GET:	127.0.0.1:8080/trace?traceNumber=1	//Params
+{
+traceNumber:1
+}
+
+浏览器:
+fetch(new Request('127.0.0.1:8080/trace?traceNumber=2',{"method":'GET'})).then((resp)=>{console.log(resp)})
+
+

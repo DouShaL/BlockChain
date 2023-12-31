@@ -1,0 +1,195 @@
+
+新建群组?
+P25修改配置文件?邮件配置?
+
+
+find / -name +文件名	//find是在指定的目录下遍历查找，如果目录使用 / 则表示在所有目录下查找
+
+JAVA_HOME问题: 
+gedit ~/.bashrc
+echo $JAVA_HOME 
+null
+export JAVA_HOME=/usr/lib/jvm/jdk-13
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
+export PATH=${JAVA_HOME}/bin:$PATH
+source /etc/profile
+
+
+mysql设置密码:
+mysql -u root -p			//使用账号密码打开(默认密码为空)
+SHOW VARIABLES LIKE 'validate_password%';	//展示密码规则
+set global validate_password.policy=0;		//更改密码规则
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';	//设置密码
+
+双机搭建:
+ifconfig 		//查看ip
+cat>ipconf<<EOF				//以EOF作为输入结束
+{
+192.168.88.130:4 Agency1 1 30300,20200,8545	//ip:节点数量 机构名 群组号 端口号
+192.168.88.129:4 Agency1 1 30300,20200,8545	//ip:节点数量 机构名 群组号 端口号
+EOF					//结束标志
+}
+
+
+设置证书过期时间:
+gedit build_chain.sh		
+{
+days=90			//天数
+}
+
+
+bash build_chain.sh -f ipconf -e ./fisco-bcos 	//-f:使用配置文件 -e:使用本地二进制文件(不指定默认从GitHub下载)    -l:指定ip和数目 -p:指定端口 -l和-f选项必须指定一个且不可共存 -T:测试建议开启
+scp -r nodes/192.168.88.129 root@192.168.88.129:/home/hhy/fisco/nodes 	//拷贝节点(双机起链)
+bash nodes/192.168.88.130/start_all.sh		//启动节点
+ps -ef|grep -v grep|grep fisco-bcos		// 检查节点进程 -v  不显示当前进程 -ef:显示所有命令，连带命令行
+tail -f node0/log/* |grep -a "connected count"	//检查节点连接状态 -a:解决匹配到二进制文件问题 -f:循环读取
+tail -f node0/log/* |grep -a "g:1.*+++"		//检查节点共识状态 g:1.*+++:群组1(缺点不显示)
+
+tar -zxvf console.tar.gz 			//解压console控制台文件
+cp -n console/conf/config-example.toml conf/config.toml	//拷贝配置文件
+cp nodes/192.168.88.129/sdk/* console/conf/ 		//拷贝证书
+bash console/start.sh				//启动console控制台
+{
+deploy HelloWorld		//部署HelloWorld合约
+getBlockNumber		//获取区块高度
+call HelloWorld 0xc8e359bba360945bdfd55f365b67683a0215c545 set "Hello,BlockChain"	//调用HelloWorld合约set方法
+call HelloWorld 0xc8e359bba360945bdfd55f365b67683a0215c545 get			//调用HelloWorld合约get方法(不增加区块高度)
+getConsensusStatus		//获取节点共识状态
+getDeployLog		//查询群组内由当前控制台部署合约的日志信息
+}
+
+节点扩容:
+bash gen_node_cert.sh -c nodes/cert/A -o nodes/192.168.88.130/node3		//生成新节点私钥证书
+cp node0/st* node0/config.ini node3					//拷贝节点配置文件
+gedit node3/config.ini						//修改配置文件端口号 增加节点信息
+{
+channel_listen_port=20203
+jsonrpc_listen_port=8548
+listen_port=30303
+node.3=192.168.88.130:30303
+}
+cp node0/conf/group.1.* node3/conf/					//拷贝群组配置文件
+cat node8/conf/node.nodeid						//查看节点id
+gedit node3/conf/group.1.genesis					//修改群组配置文件
+{
+node.8=节点id
+}
+gedit node3/conf/group.1.genesis					//修改创世节点群组配置文件
+{
+node.8=节点id
+node.9=节点id
+}
+节点连接数问题(可控):
+gedit node9/config.ini
+{
+node.8=192.168.88.130:30303
+}
+bash stop_all.sh && bash start_all.sh					//重启所有节点
+tail -f node8/log/*|grep -a "connected count"				//查看节点连接状态
+cat node8/conf/node.nodeid						//查看节点id
+bash console/start.sh
+{
+addSealer 节点id
+}
+tail -f node8/log/*|grep -a "g:1.*+++"				//查看节点共识状态
+
+新节点加入新群组:
+gedit node2/conf/group.1.genesis
+{
+node.0=新节点id
+id=2
+}
+
+黑白名单操作:	//用其中一种即可
+gedit node0/config.ini
+{
+crl.0=黑节点id
+cal.0=白节点id
+}
+tail -f node0/log/*|grep -a "connected count"		//查看节点连接状态
+
+bash console/start.sh
+{
+setSystemConfigByKey tx_count_limit 5000		//将区块链网络中最大交易数量设为 5000
+getSystemConfigByKey tx_count_limit			//通过控制台检查区块最大打包交易数量
+}
+
+
+
+
+cd webase-deploy			//进入WEBASE部署文件夹
+gedit common.properties		//更改配置文件
+{
+docker.mysql=0			
+fisco.dir=/home/dousha/fisco/nodes/192.168.88.130
+}
+python3 deploy.py installAll
+
+
+
+验证码问题: 
+gedit webase-sign/conf/application.yml
+gedit webase-node-mgr/conf/application.yml
+&useSSL=false
+
+前置端口问题:
+gedit webase-front/conf/application.yml
+{
+127.0.0.1->ip
+localhost->ip
+}
+
+
+
+mysql -u root -p123456
+{
+CREATE DATABASE IF NOT EXISTS webasechainmanager DEFAULT CHARSET utf8 COLLATE utf8_general_ci;	//新建数据库
+show databases;		//查看数据库列表
+}
+cd  dist/script		//进入数据库脚本目录
+sed -i "s/webasechainmanager/webasechainmanager/g" webase.sh	//修改数据库名称
+sed -i "s/defaultAccount/root/g" webase.sh			//修改数据库用户名★
+sed -i "s/defaultPassword/123456/g" webase.sh			//修改数据库密码★
+bash webase.sh 127.0.0.1 3306					// 运行数据库脚本
+cd ..
+cp conf_template conf -r					//根据配置模板生成一份实际配置conf 初次部署可直接拷贝
+sed -i "s/5005/5005/g" conf/application.yml				//修改服务端口
+sed -i "s/127.0.0.1/127.0.0.1/g" conf/application.yml				//修改数据库IP
+sed -i "s/3306/3306/g" conf/application.yml				//修改数据库端口
+sed -i "s/webasechainmanager/webasechainmanager/g" conf/application.yml	//修改数据库名称
+sed -i "s/defaultAccount/root/g" conf/application.yml			//修改数据库用户★
+sed -i "s/defaultPassword/123456/g" conf/application.yml			//修改数据库密码★
+
+http://localhost:5005/WeBASE-Chain-Manager/#/chain		//WeBASE链管理平台页面
+http://localhost:5005/WeBASE-Chain-Manager/swagger-ui.html	//swagger查看调用接口页面
+
+
+
+benchmarks/caliper-benchmarks/benchmarks/samples/fisco-bcos/transfer/solidity/config.yaml
+npx caliper benchmark run --caliper-workspace caliper-benchmarks --caliper-benchconfig benchmarks/samples/fisco-bcos/transfer/solidity/config.yaml  --caliper-networkconfig networks/fisco-bcos/4nodes1group/fisco-bcos.json
+
+
+
+
+cd workspace	//truffle项目测试智能合约
+tree
+{
+-contracts		//此目录存放所有需要测试的智能合约
+-migrations	//此目录存放部署合约脚本
+-test		//此目录存放测试合约的脚本
+truffle-config.js	//truffle的配置文件，可以修改一些基本信息，也可以引入第三方插件
+}
+truffle test	//如不可用 进入develop
+truffle develop
+{
+compile
+migrate
+test
+}
+cp -r workspace workspaceRepair
+gedit contracts/SetUp.sol
+{
+tx.origin => msg.sender
+}
+
