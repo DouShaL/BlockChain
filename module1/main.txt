@@ -124,7 +124,7 @@ gedit common.properties		//更改配置文件
 docker.mysql=0			
 fisco.dir=/home/dousha/fisco/nodes/192.168.88.130
 }
-python3 deploy.py installAll
+python3 deploy.py startAll		//python3 deploy.py installAll
 
 
 
@@ -161,6 +161,7 @@ sed -i "s/webasechainmanager/webasechainmanager/g" conf/application.yml	//修改
 sed -i "s/defaultAccount/root/g" conf/application.yml			//修改数据库用户★
 sed -i "s/defaultPassword/123456/g" conf/application.yml			//修改数据库密码★
 
+bash start.sh		//WeBASE-Chain-Manager/dist
 http://localhost:5005/WeBASE-Chain-Manager/#/chain		//WeBASE链管理平台页面
 http://localhost:5005/WeBASE-Chain-Manager/swagger-ui.html	//swagger查看调用接口页面
 
@@ -192,4 +193,3 @@ gedit contracts/SetUp.sol
 {
 tx.origin => msg.sender
 }
-
