@@ -40,7 +40,7 @@ days=90			//天数
 
 
 bash build_chain.sh -f ipconf -e ./fisco-bcos 	//-f:使用配置文件 -e:使用本地二进制文件(不指定默认从GitHub下载)    -l:指定ip和数目 -p:指定端口 -l和-f选项必须指定一个且不可共存 -T:测试建议开启
-scp -r nodes/192.168.88.129 root@192.168.88.129:/home/hhy/fisco/nodes 	//拷贝节点(双机起链)
+scp -r nodes/192.168.88.129 hhy@192.168.88.129:/home/hhy/fisco/nodes 	//拷贝节点(双机起链)
 bash nodes/192.168.88.130/start_all.sh		//启动节点
 ps -ef|grep -v grep|grep fisco-bcos		// 检查节点进程 -v  不显示当前进程 -ef:显示所有命令，连带命令行
 tail -f node0/log/* |grep -a "connected count"	//检查节点连接状态 -a:解决匹配到二进制文件问题 -f:循环读取
